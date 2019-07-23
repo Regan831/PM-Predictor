@@ -1,0 +1,100 @@
+\documentclass[bsc,frontabs,singlespacing,parskip,deptreport]{infthesis}
+%Juntar a document class na primeira linha "twoside" para fazer double sided.
+
+
+
+\usepackage{pdfpages}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{pgf-pie}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{natbib}
+\usepackage{color,soul}
+\usepackage{verbatim}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{subcaption}
+
+
+
+\hypersetup{
+    colorlinks=false,
+    linktoc=all
+}
+
+
+
+\begin{document}
+
+
+\title{Sensing Spaces: An online spatio-temporal model for PM2.5 predictions using a combination of stationary and mobile airborne particulate sensors}
+%\title{\vspace{-5.0cm} \centering{\includegraphics[scale=0.5]{eushield.eps}} \\ Sensing Spaces: A Study in Mapping Air Pollution in Public Spaces using Personal Exposure Monitors}
+\author{Jo\~{a}o Catarino Carvalheiro \break Neto dos Santos}
+
+\course{Master of Informatics}
+\project{{\bf MInf Project (Part I) Report}}
+
+\date{\today}
+
+\abstract{
+Air pollution monitoring and prediction at an intra-urban scale provide important information at the individual and community level. 
+This project proposes an online spatio-temporal model that predicts $PM_{2.5}$ concentrations in space and time, using a combination of mobile sensor data and stationary sensor data collected by AIRSpeck sensors. The model can be trained and make predictions in a real-time context. The model uses Ordinary Kriging and Passive-Aggressive Regressors and was tested on mobile data of two datasets provided, collected in the central area of Edinburgh in July 2018. The model performs better when mobile data is used in conjunction with stationary data. With both types of data, it performed 19\% better than the baseline. Error correction algorithms were compared on the second dataset. The best method found uses a median of global errors with at least three past observations, and this correction further improved results by 22\% compared to the base model, having an MAE of 0.948. 
+Improvements were made to the existing user interface of the Android application for the AIRSpeck-P and RESpeck data collection, to add media collection functionality and it was tested by ten participants using the sensors.
+
+
+%Proved that the use of mobile data in the training process improves results.
+%Error correction also improves results.
+}
+
+\maketitle
+
+\section*{Acknowledgements}
+A word of gratitude and appreciation to my supervisor Professor D.K. Arvind, for his proposal, guidance and support throughout the project. 
+
+Thank you to Ivan Angelinin, Mantas Miksys and Zo\"e Petard for their previous work on the Sensing Spaces project, and the participants that volunteered to test part of this work.
+
+To my father and mother for all their unconditional support and encouragement, and Santiago Garcia for his companionship.
+
+\tableofcontents
+
+%\pagenumbering{arabic}
+
+\chapter{Introduction}
+\input{chapters/introduction}
+
+\chapter{Background}
+\input{chapters/background}
+
+\chapter{Literature survey}
+\input{chapters/litsurvey}
+
+\chapter{Improved user interface for AIRSpeck mobile app}
+\input{chapters/philap}
+
+\chapter{Methodology: Online Spatio-temporal Model}
+\input{chapters/model}
+
+\chapter{Results and discussion}
+\input{chapters/results}
+
+\chapter{Conclusion}
+\input{chapters/conclusion}
+
+
+
+% use the following and \cite{} as above if you use BibTeX
+% otherwise generate bibtem entries
+\bibliographystyle{plain}
+\bibliography{mybibfile}
+
+\appendix
+\chapter{}
+\input{chapters/appendix}
+
+\end{document}

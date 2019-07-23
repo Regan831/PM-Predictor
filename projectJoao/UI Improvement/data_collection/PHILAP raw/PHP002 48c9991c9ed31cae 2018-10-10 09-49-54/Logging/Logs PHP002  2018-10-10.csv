@@ -1,0 +1,29 @@
+Timestamps in local time for easy debugging! Timezone offset to UTC (millis): 3600000
+2018-10-10 09:49:54: App started and initialised
+2018-10-10 09:49:54: Started Speck Bluetooth service
+2018-10-10 09:49:54: Phone GPS service started
+2018-10-10 09:49:54: Main Bluetooth service started
+2018-10-10 09:49:54: App was brought into foreground (Main Activity) resumed
+2018-10-10 09:49:55: Connecting to Airspeck
+2018-10-10 09:49:58: Subscribed to Airspeck
+2018-10-10 09:50:04: RESpeck disconnected
+2018-10-10 09:50:04: Connecting to RESpeck
+2018-10-10 09:50:12: Subscribed to RESpeck
+2018-10-10 09:52:30: App was brought into foreground (Main Activity) resumed
+2018-10-10 09:52:53: App was brought into foreground (Main Activity) resumed
+2018-10-10 11:05:45: App started and initialised
+2018-10-10 11:05:45: Started Speck Bluetooth service
+2018-10-10 11:05:45: Phone GPS service started
+2018-10-10 11:05:45: App was brought into foreground (Main Activity) resumed
+2018-10-10 11:05:45: Main Bluetooth service started
+2018-10-10 11:05:46: Connecting to Airspeck
+2018-10-10 11:05:48: RESpeck disconnected
+2018-10-10 11:05:48: Connecting to RESpeck
+2018-10-10 11:05:50: Subscribed to RESpeck
+2018-10-10 11:05:57: Subscribed to Airspeck
+2018-10-10 11:06:24: App was brought into foreground (Main Activity) resumed
+2018-10-10 11:14:29: App was brought into foreground (Main Activity) resumed
+2018-10-10 11:15:06: Airspeck disconnected: BleGattException{macAddress=F1:ED:48:2A:F0:0A, status=8 (0x08 -> https://android.googlesource.com/platform/external/bluetooth/bluedroid/+/android-5.1.0_r1/stack/include/gatt_api.h), bleGattOperationType=BleGattOperation{description='CONNECTION_STATE'}}
+2018-10-10 11:15:16: Connecting to Airspeck
+2018-10-10 11:15:21: Subscribed to Airspeck
+2018-10-10 11:39:10: App was brought into foreground (Main Activity) resumed
