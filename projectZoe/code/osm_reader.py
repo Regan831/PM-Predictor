@@ -17,28 +17,27 @@ class OSMReader(object):
         rangePM = maxPM - minPM
         if pm > 99999:
             return "#000000"
-        elif pm < (0.11 * rangePM + minPM):
+        elif pm < (0.1 * rangePM + minPM):
             color = "#1b7837"
-        elif pm < (0.22 * rangePM + minPM):
+        elif pm < (0.2 * rangePM + minPM):
             color ="#5aae61"
-        elif pm < (0.33 * rangePM + minPM):
+        elif pm < (0.3 * rangePM + minPM):
             color ="#a6dba0"
-        elif pm < (0.44 * rangePM + minPM):
+        elif pm < (0.4 * rangePM + minPM):
             color ="#d9f0d3"
-        elif pm < (0.55 * rangePM + minPM):
+        elif pm < (0.5 * rangePM + minPM):
              color ="#f7f7f7"
-        elif pm < (0.66 * rangePM + minPM):
+        elif pm < (0.6 * rangePM + minPM):
             color = "#e7d4e8"
-        elif pm < (0.77 * rangePM + minPM):
+        elif pm < (0.7 * rangePM + minPM):
             color = "#c2a5cf"
-        elif pm < (0.88 * rangePM + minPM):
+        elif pm < (0.8 * rangePM + minPM):
             color = "#9970ab"
         else:
             color ="#762a83"
         return color
 
     def addRoadType(self, mapObj, roadGeo, num):
-        print('laksjdfla', roadGeo)
         if(len(roadGeo) > 0):
             folium.GeoJson(roadGeo, 
                   style_function=lambda x: {
@@ -51,9 +50,9 @@ class OSMReader(object):
         colors = ["red", "orange", "yellow", "green", "blue", "purple", "#778899"]
         folium.GeoJson(landUse, 
               style_function=lambda x: {
-                    'color' : colors[num],
+                    'color' : "red",
                     'fillColor' : colors[num],
-                    'fillOpacity': 0.3
+                    'fillOpacity': 0.0
         }
               ).add_to(mapObj)
         
@@ -62,9 +61,9 @@ class OSMReader(object):
         color = self.assignColor(PM, maxPM, minPM)
         folium.GeoJson(cell, 
               style_function=lambda x: {
-                    'color' : color,
-                    'fillColor' : color,
-                    'fillOpacity': 0.5
+                    'color' : 'red',
+                    'fillColor' : 'red',
+                    'fillOpacity': 0.0
         }
               ).add_to(mapObj)
         

@@ -1,5 +1,0 @@
-Timestamps in local time for easy debugging! Timezone offset to UTC (millis): 0
-2018-11-16 07:07:24: Battery level low
-2018-11-16 08:31:52: Airspeck disconnected: BleDisconnectedException{bluetoothDeviceAddress='F1:ED:48:2A:F0:0A'}
-2018-11-16 08:31:52: RESpeck data handling error: BleDisconnectedException{bluetoothDeviceAddress='E4:E7:2E:AF:3F:F0'}
-2018-11-16 08:31:52: RESpeck disconnected

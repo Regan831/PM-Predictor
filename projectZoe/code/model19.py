@@ -103,9 +103,9 @@ def go_forward(Xtf, kernel_size):
 
     # LAYER 4
     Z4 = tf.nn.conv2d(A3,W4,strides=[1,1,1,1],padding="SAME")
-    A4 = tf.nn.sigmoid(Z4)
+#     A4 = tf.nn.sigmoid(Z4)
 
-    return A4
+    return Z4
 
 def split_data(X, Y, train_p, test_p, test=False):
     train_indx = int(X.shape[0]*train_p)
@@ -199,8 +199,8 @@ def main():
     PMstrs = ['PM1', 'PM2.5', 'PM10']
 
     #Example values for performing a grid search over kernel size and learning rate
-    kernel_sizes = [1]#[1, 2, 3]
-    learning_rates = [0.005]#[0.005, 0.001, 0.0005,  0.0001]
+    kernel_sizes = [1]
+    learning_rates = [0.001]
     beta = 1
 
     for kernel_size in kernel_sizes:

@@ -28,7 +28,7 @@ def load_data(GRID_SIZE, collected_data_dates, PM_index):
         pd_df=pd.read_csv(PM_file, sep=',',header=None)
         PM2pt5 = pd_df.values
         
-        env_file = static_dir + str(date) + "/" + str(date) + "_grid" + str(GRID_SIZE) + ".csv"
+        env_file = static_dir  + str(date) + "/PM2.5/" + str(date) + "_grid" + str(GRID_SIZE) + ".csv"
         with open(env_file, 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='|')
             medianTime = pd.to_datetime(next(reader)[0])
@@ -38,7 +38,7 @@ def load_data(GRID_SIZE, collected_data_dates, PM_index):
         hum = np.zeros((GRID_SIZE, GRID_SIZE)) + float(averageHum)
         holder = np.ones((GRID_SIZE, GRID_SIZE)) #Placeholder if layers are to be excluded in the next line
 
-        x = np.array([PM2pt5])
+        x = np.array([landuse, roadtype, PM2pt5])
 
         x = np.transpose(x, (1, 2, 0))
 
@@ -49,7 +49,10 @@ def load_data(GRID_SIZE, collected_data_dates, PM_index):
         else:
             X = np.vstack([X,x])
          
-        sids = ['XXM007', 'XXM008']
+        sids = ['XXE101', 'XXE102', 'XXE103', 'XXE104']
+#         sids = ['XXM007', 'XXM008']
+#         sids = ['all']
+
         label_dir = "/Users/ryanegan/Documents/diss/projectZoe/data/label/"+str(date)+"/"
         label_file = label_dir + sids[0] + "_" + str(date) + "_" + PMstrs[PM_index] + "_grid" + str(GRID_SIZE) + ".csv"
         labels_found = False
@@ -83,7 +86,7 @@ def go_forward(Xtf, kernel_size):
 
     with tf.variable_scope("icnv1", reuse=tf.AUTO_REUSE):
 # PARAMETERS
-        W1 = tf.get_variable("W1",shape=[kernel_size,kernel_size,1,32],initializer=tf.contrib.layers.xavier_initializer(seed=0),dtype="float")
+        W1 = tf.get_variable("W1",shape=[kernel_size,kernel_size,3,32],initializer=tf.contrib.layers.xavier_initializer(seed=0),dtype="float")
         W2 = tf.get_variable("W2",shape=[kernel_size,kernel_size,32,64],initializer=tf.contrib.layers.xavier_initializer(seed=0),dtype="float")
         W3 = tf.get_variable("W3",shape=[kernel_size,kernel_size,64,128],initializer=tf.contrib.layers.xavier_initializer(seed=0),dtype="float")
         W4 = tf.get_variable("W4",shape=[kernel_size,kernel_size,128,1],initializer=tf.contrib.layers.xavier_initializer(seed=0),dtype="float")
@@ -104,9 +107,9 @@ def go_forward(Xtf, kernel_size):
 
         # LAYER 4
         Z4 = tf.nn.conv2d(A3,W4,strides=[1,1,1,1],padding="SAME")
-        A4 = tf.nn.sigmoid(Z4)
+#         A4 = tf.nn.sigmoid(Z4)
 
-        return A4
+        return Z4
 
 def split_data(X, Y, train_p, test_p, test=False):
     train_indx = int(X.shape[0]*train_p)
@@ -141,9 +144,9 @@ def train(X, Y, train_perc, kernel_size, GRID_SIZE, valid_date, PM_index, learni
     #Tensorflow placeholders
     PMstrs = ['PM1', 'PM2.5', 'PM10']
     PM_str = PMstrs[PM_index]
+    best_score = 9999
 
     tf.reset_default_graph()
-    best_score = 0.
     best_iter = 0
     start_time = time.time()
     max_duration = 900
@@ -153,7 +156,7 @@ def train(X, Y, train_perc, kernel_size, GRID_SIZE, valid_date, PM_index, learni
     valid_costs = [1] * max_iterations
     
     with tf.Session() as sess:
-        Xtf = tf.placeholder(name="Xtf",shape=[None,GRID_SIZE,GRID_SIZE,1],dtype="float")
+        Xtf = tf.placeholder(name="Xtf",shape=[None,GRID_SIZE,GRID_SIZE,3],dtype="float")
         Ytf = tf.placeholder(name="Ytf",shape=[None,GRID_SIZE,GRID_SIZE,1],dtype="float")
         
         A4 = go_forward(Xtf, kernel_size)
@@ -173,48 +176,93 @@ def train(X, Y, train_perc, kernel_size, GRID_SIZE, valid_date, PM_index, learni
             print("valid cost:",valid_costs[i])
             print("************************\n")
 
-            if train_costs[i] < best_score and best_iter <= i-10:
-                print("Converged")
-                break
+            if valid_costs[i] < best_score:
+                best_score = valid_costs[i]
+                best_iter = i
+                save_path = saver.save(sess, "/tmp/model.ckpt")
+                print('best iter: ', best_iter, ' best score: ', best_score)
+                directory = './results/tune19examples/learning_rate_' +str(learning_rate) + '/kernel_size_' +str(kernel_size)+'/grid_size_'+str(GRID_SIZE) + '/valid_date_'+str(valid_date)+'/'
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                prediction, iou_pred = sess.run([A4,cost],{Xtf:X_valid,Ytf:Y_valid})
+                np.savetxt(directory + PM_str +"_train_cost.csv", train_costs)
+                np.savetxt(directory + PM_str +"_valid_cost.csv", valid_costs)
+                np.savetxt(directory + PM_str +"_Y_valid.csv", np.squeeze(Y_valid))
+                np.savetxt(directory + PM_str +"_prediction.csv", np.squeeze(prediction))
+       
+                
+                
             # elif time.time() >= start_time + max_duration:
             #     print("timed out")
             #     break
-            else:
-                best_score = train_costs[i]
-                best_iter = i
-                saver.save(sess, 'model')
+            elif  best_iter <= i-200:
+                print("Converged")
+                break
+
+
+                
 
         prediction, iou_pred = sess.run([A4,cost],{Xtf:X_valid,Ytf:Y_valid})
-        print
         print("validation cost: ",iou_pred)
         print("prediction: ", prediction) #Useful to see if model converged
 
-        directory = '../results/tune19examples/learning_rate/learning_rate_' +str(learning_rate) + '/kernel_size_' +str(kernel_size) + '/valid_date_'+str(valid_date)+'/'
-
-        np.savetxt(directory + PM_str +"_train_cost.csv", train_costs)
-        np.savetxt(directory + PM_str +"_valid_cost.csv", valid_costs)
-        np.savetxt(directory + PM_str +"_Y_valid.csv", np.squeeze(Y_valid))
-        np.savetxt(directory + PM_str +"_prediction.csv", np.squeeze(prediction))
-       
         
-def predict(X, GRID_SIZE):
-    init_g = tf.global_variables_initializer()
-    init_l = tf.local_variables_initializer()
+def predict(X, GRID_SIZE, timestep):
+    osm_dir = "/Users/ryanegan/Documents/diss/projectZoe/data/osm/"
+    LU_file = osm_dir + "landuse_grid" + str(GRID_SIZE) + ".csv"
+    road_file = osm_dir + "roadtype_grid" + str(GRID_SIZE) + ".csv"
+    
+    pd_df1=pd.read_csv(LU_file, sep=',',header=None, skiprows=1)
+    landuse = pd_df1.values
+    pd_df2=pd.read_csv(road_file, sep=',',header=None, skiprows=1)
+    roadtype = pd_df2.values
+    static_dir = "/Users/ryanegan/Documents/diss/projectZoe/data/train/PM2.5/"
+    
+#     env_file = static_dir + str(date) + "/" + str(date) + "_grid" + str(GRID_SIZE) + ".csv"
+#     with open(env_file, 'r') as csvfile:
+#         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+#         medianTime = pd.to_datetime(next(reader)[0])
+#         averageTemp = next(reader)[0]
+#         averageHum = next(reader)[0]
+
+#     hum = np.zeros((GRID_SIZE, GRID_SIZE)) + float(averageHum)
+#     holder = np.ones((GRID_SIZE, GRID_SIZE)) #Placeholder if layers are to be excluded in the next line
+    x = np.array([landuse, roadtype, X])
+
+    x = np.transpose(x, (1, 2, 0))
+
+    x = np.expand_dims(x,0)
+    
+#     X = np.vstack([X,x])
+    tf.reset_default_graph()
+    W1 = tf.get_variable("icnv1/W1",shape=[1,1,3,32])
+    W2 = tf.get_variable("icnv1/W2",shape=[1,1,32,64])
+    W3 = tf.get_variable("icnv1/W3",shape=[1,1,64,128])
+    W4 = tf.get_variable("icnv1/W4",shape=[1,1,128,1])
+
+    saver = tf.train.Saver()
+    
+
+#     init_g = tf.global_variables_initializer()
+#     init_l = tf.local_variables_initializer()
     with tf.Session() as sess:
             
-        sess.run(init_g)
-        sess.run(init_l)
-        Xtf = tf.placeholder(name="Xtf",shape=[None,GRID_SIZE,GRID_SIZE,1],dtype="float")
-        X = np.array(X).flatten()
-        X = [-1 if v is None else v for v in X]
-        X = np.array(X, dtype='float32').reshape(1,GRID_SIZE,GRID_SIZE,1)
+#         sess.run(init_g)
+#         sess.run(init_l)
+        saver.restore(sess, "/tmp/model.ckpt")
+         # Check the values of the variables
+        Xtf = tf.placeholder(name="Xtf",shape=[None,GRID_SIZE,GRID_SIZE,3],dtype="float")
+
+        X = np.array(x, dtype='float32').reshape(1,GRID_SIZE,GRID_SIZE,3)
 
 
         A4 = go_forward(Xtf, 1)
         pred = sess.run([A4],feed_dict={Xtf:X})
-        something = [n.name for n in tf.get_default_graph().as_graph_def().node]
-        print(len(something))
-        tf.reset_default_graph()
+        directory = './results/predictions/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        np.savetxt(directory + "prediction_" + str(timestep) + ".csv", np.squeeze(pred))
     return pred
     
 def main():
@@ -225,24 +273,23 @@ def main():
 
     #Example values for performing a grid search over kernel size and learning rate
     kernel_sizes = [1]#[1, 2, 3]
-    learning_rates = [0.005]#[0.005, 0.001, 0.0005,  0.0001]
+    learning_rates = [0.001] #[0.005, 0.001, 0.0005,  0.0001]
     beta = 1
     
     for kernel_size in kernel_sizes:
         for learning_rate in learning_rates:
             PM_index = 1 #Train only on PM2.5
             PM_str = PMstrs[PM_index]
-            for i in range(np.shape(collected_data_dates)[0]):
-                valid_date = collected_data_dates[np.shape(collected_data_dates)[0] - 1]
-                print("iteration i : ", i, "valid_date : ", valid_date)
-                X, Y = load_data(GRID_SIZE, collected_data_dates, PM_index)
-                directory = os.path.dirname('../results/tune19examples/learning_rate/learning_rate_' +str(learning_rate) + '/kernel_size_' +str(kernel_size) + '/valid_date_'+str(valid_date)+'/')
+            valid_date = collected_data_dates[np.shape(collected_data_dates)[0] - 10]
+            print("valid_date : ", valid_date)
+            X, Y = load_data(GRID_SIZE, collected_data_dates, PM_index)
+            directory = os.path.dirname('../results/tune19examples/learning_rate/learning_rate_' +str(learning_rate) + '/kernel_size_' +str(kernel_size)+'/grid_size_'+str(GRID_SIZE) + '/valid_date_'+str(valid_date)+'/')
 
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-        
-                train(X, Y, 0.95, kernel_size, GRID_SIZE, valid_date, PM_index, learning_rate, beta)
-                collected_data_dates = np.roll(collected_data_dates, 1)
-                valid_date = collected_data_dates[np.shape(collected_data_dates)[0] - 1]
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            train(X, Y, 0.98, kernel_size, GRID_SIZE, valid_date, PM_index, learning_rate, beta)
+            collected_data_dates = np.roll(collected_data_dates, 1)
+            valid_date = collected_data_dates[np.shape(collected_data_dates)[0] - 10]
 
 main()

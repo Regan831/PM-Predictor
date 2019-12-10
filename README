@@ -1,0 +1,16 @@
+Welcome to Ryan's Dissertation code. Most of the notebooks are a lot of the same
+ code but with minor variations for different experiments. Most of this is a
+ mess so I'm sorry.
+
+constants are constants for the temporal models
+cnnConstants are the constants for the temporal CNN
+continuous-lstm is an lstm model just for temporal predictions
+continuous-online - preliminary temporal only predictions
+continuous-pred-grid-CNN - temporal and spatial predictions using a grid and CNN
+continuous-pred-grid-OK - temporal and spatial predictions using a grid and Ordinary Kriging
+continuous-pred-grid-temporal - temporal only predictions using a grid
+Explore Leading Inidcators - A way of looking at the variables to see which visibly predict pollution
+**Load Data - Loads, formats, and saves the Data
+Mapping Heat Map - One way of mapping the pollution heat maps on a real map
+model19 - CNN model taken from Zoë's work with slight alteration
+spatial-lstm - an attempt at making an lstm work both spatially and temporally
