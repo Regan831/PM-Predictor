@@ -22,5 +22,11 @@ This work could be enhanced with more features being extracted for use. Only lan
 
 ## Files
 `temporal_pred` - Notebook which uses method one (multiple NNs) to make strictly temporal predictions.
+
+`continuous-Pred-Grid-OK` - Notebook for examining the temporal performance of method two (one NN for entire grid).
+
 `continuous-Pred-Grid-CNN` - Notebook using method two (one NN for entire grid) to make temporal predictions then uses a CNN to fill in empty cells.
+
 `continuous-Pred-Grid-OK` - Notebook using method two (one NN for entire grid) to make temporal predictions then uses a Ordinary Krieging to fill in empty cells.
+
+`model19.py` - CNN model used for spatial interpolation.
