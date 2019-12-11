@@ -23,11 +23,6 @@ class DataDownloader(object):
             '9C4F842B28FC5971', '3AB8A58A952B89B6', 'AE93FD8053BFDDFD', '3BC10C97D2490E7B',
             '660CB9BC2A97231A', 'F753DAAE895C0DEB']
 
-        payload = {
-            'username': 'jupyter',
-            'password': 'd84hr75yG4fE',
-            'form.submitted':'Login'
-        }
         
         with requests.Session() as s:
             s.headers.update({'referer': 'https://dashboard.specknet.uk'})
